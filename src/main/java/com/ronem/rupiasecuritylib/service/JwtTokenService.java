@@ -9,8 +9,9 @@
 
 package com.ronem.rupiasecuritylib.service;
 
-import com.ronem.rupiasecuritylib.enums.UserRole;
 import com.ronem.rupiasecuritylib.properties.JwtProperties;
+import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
@@ -18,7 +19,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
-import java.util.Date;
 
 
 @Service
@@ -51,49 +51,66 @@ public class JwtTokenService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
+    public boolean validateAccessToken(String token) {
+        return validateToken(token, getAccessTokenSecretKey(), ACCESS);
+    }
 
-    /**
-     * Generate Access-Token for customer (user based on Mobile number)
-     *
-     * @param userId
-     * @param mobileNumber
-     * @return
-     */
-    public String createAccessTokenForCustomer(String userId, String mobileNumber) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtProperties.getAccessTokenExpiryTime());
-        return Jwts.builder()
-                .subject(userId)
-                .claim(CLAIM_MOBILE_NUMBER, mobileNumber)
-                .claim(CLAIM_ROLE, UserRole.CUSTOMER.name())
-                .claim(CLAIM_TOKEN_TYPE, ACCESS)
-                .issuedAt(now)
-                .expiration(expiryDate)
-                .signWith(getAccessTokenSecretKey())
-                .compact();
+    public boolean validateRefreshToken(String token) {
+        return validateToken(token, getRefreshTokenSecretKey(), REFRESH);
     }
 
     /**
-     * Generate Access-Token for Admins (user based on email)
+     * Single method to validate the tokens like access-token and refresh-token
      *
-     * @param userId
-     * @param email
-     * @param role
+     * @param token
+     * @param secretKey
+     * @param expectedType
      * @return
      */
-    public String createAccessTokenForAdmin(String userId, String email, String role) {
-        Date now = new Date();
-        Date expiryDate = new Date(now.getTime() + jwtProperties.getAccessTokenExpiryTime());
-        return Jwts.builder()
-                .subject(userId)
-                .claim(CLAIM_EMAIL, email)
-                .claim(CLAIM_ROLE, role)
-                .claim(CLAIM_TOKEN_TYPE, ACCESS)
-                .issuedAt(now)
-                .expiration(expiryDate)
-                .signWith(getAccessTokenSecretKey())
-                .compact();
+    private boolean validateToken(String token, SecretKey secretKey, String expectedType) {
+        try {
+            Claims claims = getClaims(token, secretKey);
+
+            String tokenType = claims.get(CLAIM_TOKEN_TYPE, String.class);
+            return tokenType.equals(expectedType);
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
+        }
     }
 
-    public
+    /**
+     * Return claim from the given token
+     *
+     * @param token
+     * @param secretKey
+     * @return
+     */
+    private Claims getClaims(String token, SecretKey secretKey) {
+        return Jwts.parser().verifyWith(secretKey).build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+    }
+
+
+    /**
+     * Return subject from the provided token. generally the userId with type Long
+     *
+     * @param token
+     * @param secretKey
+     * @return
+     */
+    public Long getSubject(String token, SecretKey secretKey) {
+        return Long.parseLong(getClaims(token, secretKey).getSubject());
+    }
+
+    /**
+     * Return Current user role from the token provided.
+     * @param token
+     * @param secretKey
+     * @return
+     */
+    public String getRole(String token, SecretKey secretKey) {
+        return getClaims(token, secretKey).get(CLAIM_ROLE, String.class);
+    }
 }
