@@ -26,12 +26,12 @@ import javax.crypto.SecretKey;
 public class JwtTokenService {
 
     private final JwtProperties jwtProperties;
-    private static final String CLAIM_TOKEN_TYPE = "token_type";
-    private static final String CLAIM_ROLE = "role";
-    private static final String CLAIM_MOBILE_NUMBER = "mobileNumber";
-    private static final String CLAIM_EMAIL = "email";
-    private static final String ACCESS = "ACCESS";
-    private static final String REFRESH = "REFRESH";
+    public static final String CLAIM_TOKEN_TYPE = "token_type";
+    public static final String CLAIM_ROLE = "role";
+    public static final String CLAIM_MOBILE_NUMBER = "mobileNumber";
+    public static final String CLAIM_EMAIL = "email";
+    public static final String ACCESS = "ACCESS";
+    public static final String REFRESH = "REFRESH";
 
     /**
      *
@@ -42,51 +42,27 @@ public class JwtTokenService {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    /**
-     *
-     * @return RefreshToken Secret Key
-     */
-    public SecretKey getRefreshTokenSecretKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(jwtProperties.getRefreshSecret());
-        return Keys.hmacShaKeyFor(keyBytes);
-    }
 
     public boolean validateAccessToken(String token) {
-        return validateToken(token, getAccessTokenSecretKey(), ACCESS);
-    }
-
-    public boolean validateRefreshToken(String token) {
-        return validateToken(token, getRefreshTokenSecretKey(), REFRESH);
-    }
-
-    /**
-     * Single method to validate the tokens like access-token and refresh-token
-     *
-     * @param token
-     * @param secretKey
-     * @param expectedType
-     * @return
-     */
-    private boolean validateToken(String token, SecretKey secretKey, String expectedType) {
         try {
-            Claims claims = getClaims(token, secretKey);
+            Claims claims = getClaims(token);
 
             String tokenType = claims.get(CLAIM_TOKEN_TYPE, String.class);
-            return tokenType.equals(expectedType);
+            return tokenType.equals(ACCESS);
         } catch (JwtException | IllegalArgumentException e) {
             return false;
         }
     }
 
+
     /**
      * Return claim from the given token
      *
      * @param token
-     * @param secretKey
      * @return
      */
-    private Claims getClaims(String token, SecretKey secretKey) {
-        return Jwts.parser().verifyWith(secretKey).build()
+    private Claims getClaims(String token) {
+        return Jwts.parser().verifyWith(getAccessTokenSecretKey()).build()
                 .parseSignedClaims(token)
                 .getPayload();
 
@@ -97,20 +73,39 @@ public class JwtTokenService {
      * Return subject from the provided token. generally the userId with type Long
      *
      * @param token
-     * @param secretKey
      * @return
      */
-    public Long getSubject(String token, SecretKey secretKey) {
-        return Long.parseLong(getClaims(token, secretKey).getSubject());
+    public Long getSubject(String token) {
+        return Long.parseLong(getClaims(token).getSubject());
     }
 
     /**
      * Return Current user role from the token provided.
+     *
      * @param token
-     * @param secretKey
      * @return
      */
-    public String getRole(String token, SecretKey secretKey) {
-        return getClaims(token, secretKey).get(CLAIM_ROLE, String.class);
+    public String getRole(String token) {
+        return getClaims(token).get(CLAIM_ROLE, String.class);
+    }
+
+    /**
+     * Return Current user email from the token provided.
+     *
+     * @param token
+     * @return
+     */
+    public String getClaimEmail(String token) {
+        return getClaims(token).get(CLAIM_EMAIL, String.class);
+    }
+
+    /**
+     * Return Current user mobile number from the token provided.
+     *
+     * @param token
+     * @return
+     */
+    public String getClaimMobileNumber(String token) {
+        return getClaims(token).get(CLAIM_MOBILE_NUMBER, String.class);
     }
 }

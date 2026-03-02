@@ -6,7 +6,7 @@
 
     <groupId>com.ronem.rupia</groupId>
     <artifactId>rupia-security-lib</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
     <packaging>jar</packaging>
 
     <name>rupia-security-lib</name>
@@ -61,6 +61,14 @@
             <artifactId>jjwt-jackson</artifactId>
             <version>0.12.6</version>
             <scope>runtime</scope>
+        </dependency>
+
+        <!--Provided true means it will be provided by microservices-->
+        <!--As it comes from sprint-boot-starter-web from microservices and its not inside the security-lib-->
+        <dependency>
+            <groupId>jakarta.servlet</groupId>
+            <artifactId>jakarta.servlet-api</artifactId>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

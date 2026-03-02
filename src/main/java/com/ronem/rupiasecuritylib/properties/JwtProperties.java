@@ -23,7 +23,4 @@ import org.springframework.stereotype.Component;
 public class JwtProperties {
     private String accessSecret;
     private String refreshSecret;
-
-    private Long accessTokenExpiryTime = 5 * 60 * 1000L;
-    private Long refreshTokenExpiryTime = 30 * 24 * 60 * 60 * 1000L;
 }
