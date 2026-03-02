@@ -12,7 +12,7 @@ package com.ronem.rupiasecuritylib.filter;
 import com.ronem.rupiasecuritylib.enums.UserRole;
 import com.ronem.rupiasecuritylib.model.UserPrincipal;
 import com.ronem.rupiasecuritylib.properties.JwtProperties;
-import com.ronem.rupiasecuritylib.service.JwtTokenService;
+import com.ronem.rupiasecuritylib.service.JwtTokenValidatorService;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +32,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenService jwtTokenService;
+    private final JwtTokenValidatorService jwtTokenService;
     private final JwtProperties jwtProperties;
 
     @Override
@@ -85,7 +85,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
 
         } catch (Exception e) {
-            log.info("Could not set userauthentication {}", e.getMessage());
+            log.info("Could not set user-authentication {}", e.getMessage());
         }
 
         /**
