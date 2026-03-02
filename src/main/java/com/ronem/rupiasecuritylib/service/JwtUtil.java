@@ -23,7 +23,7 @@ import javax.crypto.SecretKey;
 
 @Service
 @RequiredArgsConstructor
-public class JwtTokenValidatorService {
+public class JwtUtil {
 
     private final JwtProperties jwtProperties;
     public static final String CLAIM_TOKEN_TYPE = "token_type";

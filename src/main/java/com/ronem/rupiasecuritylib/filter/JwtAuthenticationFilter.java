@@ -12,7 +12,7 @@ package com.ronem.rupiasecuritylib.filter;
 import com.ronem.rupiasecuritylib.enums.UserRole;
 import com.ronem.rupiasecuritylib.model.UserPrincipal;
 import com.ronem.rupiasecuritylib.properties.JwtProperties;
-import com.ronem.rupiasecuritylib.service.JwtTokenValidatorService;
+import com.ronem.rupiasecuritylib.service.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -32,7 +32,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
-    private final JwtTokenValidatorService jwtTokenService;
+    private final JwtUtil jwtTokenService;
     private final JwtProperties jwtProperties;
 
     @Override
