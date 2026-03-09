@@ -24,6 +24,6 @@ public class JwtProperties {
     private String accessSecret;
     private String refreshSecret;
 
-    private final long ACCESS_TOKEN_EXPIRATION = 5 * 60 * 1000; // 5 min
-    private final long REFRESH_TOKEN_EXPIRATION = 7L * 24 * 60 * 60 * 1000;
+    public final long ACCESS_TOKEN_EXPIRATION = 5 * 60 * 1000; // 5 min
+    public final long REFRESH_TOKEN_EXPIRATION = 7L * 24 * 60 * 60 * 1000;
 }
