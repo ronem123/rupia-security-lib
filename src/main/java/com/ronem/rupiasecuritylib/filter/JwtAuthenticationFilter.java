@@ -13,6 +13,7 @@ import com.ronem.rupiasecuritylib.enums.UserRole;
 import com.ronem.rupiasecuritylib.model.UserPrincipal;
 import com.ronem.rupiasecuritylib.properties.JwtProperties;
 import com.ronem.rupiasecuritylib.service.JwtUtil;
+import com.ronem.rupiasecuritylib.util.UserRoleUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -34,6 +35,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtTokenService;
     private final JwtProperties jwtProperties;
+    private final UserRoleUtil userRoleUtil;
 
     @Override
     protected void doFilterInternal(
@@ -47,7 +49,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 Long userId = jwtTokenService.getSubject(token);
                 String role = jwtTokenService.getRole(token);
 
-                UserRole userRole = getMappedUserRole(role);
+                UserRole userRole = userRoleUtil.getMappedUserRole(role);
                 UserPrincipal userPrincipal;
                 /**
                  * If user is CUSTOMER don't set email
@@ -59,7 +61,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             .userId(userId)
                             .email(null)
                             .mobileNumber(mobileNumber)
-                            .role(getMappedUserRole(role))
+                            .role(userRole)
                             .build();
                 } else {
                     String email = jwtTokenService.getClaimEmail(token);
@@ -67,7 +69,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                             .userId(userId)
                             .email(email)
                             .mobileNumber(null)
-                            .role(getMappedUserRole(role))
+                            .role(userRole)
                             .build();
                 }
 
@@ -94,13 +96,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    private UserRole getMappedUserRole(String role) {
-        if (role.equals(UserRole.ADMIN.name()))
-            return UserRole.ADMIN;
-        else if (role.equals(UserRole.SUPER_ADMIN.name()))
-            return UserRole.SUPER_ADMIN;
-        else return UserRole.ADMIN;
-    }
 
     private String extractToken(HttpServletRequest request) {
         String bearerToken = request.getHeader(HttpHeaders.AUTHORIZATION);
