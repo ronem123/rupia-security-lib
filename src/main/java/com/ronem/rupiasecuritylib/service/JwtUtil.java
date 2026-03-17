@@ -16,7 +16,10 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import javax.crypto.SecretKey;
 
@@ -54,6 +57,17 @@ public class JwtUtil {
         }
     }
 
+
+    /**
+     * Extract token
+     */
+    public String extractToken(ServerHttpRequest request) {
+        String bearerToken = request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith("Bearer ")) {
+            return bearerToken.substring(7);
+        }
+        return null;
+    }
 
     /**
      * Return claim from the given token

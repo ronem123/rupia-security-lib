@@ -15,4 +15,5 @@ public class HeaderUtil {
     public static final String xUserMobile = "X-User-Mobile";
     public static final String xUserRole = "X-User-Role";
     public static final String xInternalSecret = "X-Internal-Secret";
+
 }
