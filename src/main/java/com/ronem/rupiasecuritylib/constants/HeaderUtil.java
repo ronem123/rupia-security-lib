@@ -7,7 +7,7 @@
  */
 
 
-package com.ronem.rupiasecuritylib.util;
+package com.ronem.rupiasecuritylib.constants;
 
 public class HeaderUtil {
     public static final String xUserId = "X-User-Id";

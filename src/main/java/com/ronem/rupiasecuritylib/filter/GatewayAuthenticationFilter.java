@@ -12,7 +12,7 @@ package com.ronem.rupiasecuritylib.filter;
 import com.ronem.rupiasecuritylib.enums.UserRole;
 import com.ronem.rupiasecuritylib.model.UserPrincipal;
 import com.ronem.rupiasecuritylib.properties.JwtProperties;
-import com.ronem.rupiasecuritylib.util.HeaderUtil;
+import com.ronem.rupiasecuritylib.constants.HeaderUtil;
 import com.ronem.rupiasecuritylib.util.UserRoleUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -23,11 +23,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
+import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Slf4j
+@Component
 @RequiredArgsConstructor
 public class GatewayAuthenticationFilter extends OncePerRequestFilter {
 
