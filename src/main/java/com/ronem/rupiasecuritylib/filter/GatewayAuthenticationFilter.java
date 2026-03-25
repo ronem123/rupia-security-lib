@@ -9,10 +9,11 @@
 
 package com.ronem.rupiasecuritylib.filter;
 
+import com.ronem.rupiasecuritylib.constants.HeaderUtil;
+import com.ronem.rupiasecuritylib.constants.PublicPaths;
 import com.ronem.rupiasecuritylib.enums.UserRole;
 import com.ronem.rupiasecuritylib.model.UserPrincipal;
 import com.ronem.rupiasecuritylib.properties.JwtProperties;
-import com.ronem.rupiasecuritylib.constants.HeaderUtil;
 import com.ronem.rupiasecuritylib.util.UserRoleUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -43,13 +44,16 @@ public class GatewayAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         //skip actuator
-        if (path.startsWith("/actuator")) {
+        if (path.startsWith("/actuator") || PublicPaths.isPublicPath(path)) {
             filterChain.doFilter(request, response);
+            log.warn("The provided path is public, {}", path);
             return;
         }
 
+
         // 1. validate internal secret
         String internalSecret = request.getHeader(HeaderUtil.xInternalSecret);
+
         if (internalSecret == null || !internalSecret.equals(jwtProperties.getAccessSecret())) {
             log.warn("Blocked direct access: Invalid internal secret from {}", request.getRemoteAddr());
             response.setStatus(HttpServletResponse.SC_FORBIDDEN);
@@ -57,6 +61,9 @@ public class GatewayAuthenticationFilter extends OncePerRequestFilter {
             response.getWriter().write("{\"error\":\"Forbidden\"}");
             return;
         }
+
+        log.info("Secret from Gateway {}", internalSecret);
+        log.info("Secret from microservice {}", jwtProperties.getAccessSecret());
 
         // 2. Read user info from headers (set by Api Gateway)
         String hUserId = request.getHeader(HeaderUtil.xUserId);
@@ -98,8 +105,8 @@ public class GatewayAuthenticationFilter extends OncePerRequestFilter {
             authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
             SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
-            // 4. continue filter chain
-            filterChain.doFilter(request, response);
         }
+        // 4. continue filter chain
+        filterChain.doFilter(request, response);
     }
 }

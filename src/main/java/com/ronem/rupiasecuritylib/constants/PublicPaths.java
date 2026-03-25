@@ -21,7 +21,7 @@ public class PublicPaths {
 
     // rupia-customer public paths
     public static final List<String> CUSTOMER_PUBLIC_PATHS = Arrays.asList(
-            "customer/register"
+            "/customer/register"
     );
 
     // Common public paths
