@@ -71,6 +71,10 @@ public class GatewayAuthenticationFilter extends OncePerRequestFilter {
         String hUserMobile = request.getHeader(HeaderUtil.xUserMobile);
         String hRole = request.getHeader(HeaderUtil.xUserRole);
 
+        log.info("Userid :{}", hUserId);
+        log.info("UserEmail :{}", hUserEmail);
+        log.info("UserRole :{}", hRole);
+
         // 3. set the SecurityContext if user is present
         if (hUserId != null && hRole != null) {
             Long userId = Long.parseLong(hUserId);
